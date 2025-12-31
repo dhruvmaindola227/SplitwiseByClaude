@@ -1,11 +1,5 @@
 ﻿using SplitwiseByClaude.Entities;
 using SplitwiseByClaude.SplitwiseDb;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using static SplitwiseByClaude.Entities.Enum;
 
 namespace SplitwiseByClaude.Services
@@ -14,10 +8,12 @@ namespace SplitwiseByClaude.Services
     {
         private readonly IMockDb _mockDb;
         private readonly ISplitService _splitService;
-        public ExpenseService(IMockDb mockDb, ISplitService splitService)
+        private readonly IBalanceService _balanceService;
+        public ExpenseService(IMockDb mockDb, ISplitService splitService, IBalanceService balanceService)
         {
             _mockDb = mockDb;
             _splitService = splitService;
+            _balanceService = balanceService;
         }
         public void AddExpense(string description, int amount, DateTime dateIncurred, string paidByEmail, SplitType splitType, List<string> splitBetweenEmails, Dictionary<string, int>? userEmailVsValue)
         {
@@ -62,6 +58,8 @@ namespace SplitwiseByClaude.Services
             currExpense.UserEmailVsSplit = initialSplits;
 
             _splitService.CalculateSplits(currExpense, userEmailVsValue);
+
+            _balanceService.UpdateBalances(currExpense);
 
             _mockDb.AddEntity(currExpense);
         }

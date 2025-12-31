@@ -12,9 +12,11 @@ namespace SplitwiseByClaude.Services
     public class UserService : IUserService
     {
         private readonly IMockDb _mockDb;
-        public UserService(IMockDb mockDb)
+        private readonly IBalanceService _balanceService;
+        public UserService(IMockDb mockDb, IBalanceService balanceService)
         {
             _mockDb = mockDb;
+            _balanceService = balanceService;
         }
         public void AddUser(string name, string email, string phoneNumber)
         {
@@ -32,6 +34,8 @@ namespace SplitwiseByClaude.Services
             if (currentUser is not null)
                 throw new InvalidOperationException("User with the same email already exists.");
 
+            _balanceService.UpdateUsersBalanceInfo(email);
+
             _mockDb.AddEntity<User>(new User
             {
                 Name = name,
@@ -42,6 +46,7 @@ namespace SplitwiseByClaude.Services
 
         public List<User> GetAllUsers()
         {
+            _mockDb.GetUsers().Add(new User() { Email = "mukesh@gmail.com", Name = "asd", PhoneNumber = "34342" });
             return _mockDb.GetUsers();
         }
 

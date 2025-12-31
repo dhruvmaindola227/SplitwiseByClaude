@@ -12,5 +12,8 @@ namespace SplitwiseByClaude.SplitwiseDb
         public List<User> GetUsers();
         public List<Expense> GetExpenses();
         public void AddEntity<T>(T entity) where T : class;
+        public int[,] GetBalancesData();
+        public Dictionary<string, int> GetUserEmailToIndexMap();
+        public void UpdateBalancesData(int[,] balancesData, Dictionary<string, int> userEmailToIndex);
     }
 }

@@ -15,6 +15,7 @@ namespace SplitwiseByClaude
             builder.Services.AddSingleton<IUserService, UserService>();
             builder.Services.AddSingleton<IExpenseService, ExpenseService>();
             builder.Services.AddSingleton<ISplitService, SplitService>();
+            builder.Services.AddSingleton<IBalanceService, BalanceService>();
             builder.Services.AddSingleton<SplitwiseApplication>();
             var app = builder.Build();
             Console.WriteLine("Splitwise application");

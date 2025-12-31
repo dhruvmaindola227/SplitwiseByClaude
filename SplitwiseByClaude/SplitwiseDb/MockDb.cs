@@ -7,32 +7,57 @@ using System.Threading.Tasks;
 
 namespace SplitwiseByClaude.SplitwiseDb
 {
-    public class MockDb : IMockDb
+    public sealed class MockDb : IMockDb
     {
-        private readonly List<User> Users;
-        private readonly List<Expense> Expenses;
+        private readonly List<User> _users;
+        private readonly List<Expense> _expenses;
+        private int[,] _balancesData;
+        private readonly Dictionary<string, int> _userEmailToIndexMap;
         public MockDb()
         {
-            Users = new();
-            Expenses = new();
+            _users = new();
+            _expenses = new();
+            _balancesData = new int[0,0];
+            _userEmailToIndexMap = new(StringComparer.OrdinalIgnoreCase);
         }
 
         public List<User> GetUsers()
         {
-            return Users;
+            return _users;
         }
+
         public List<Expense> GetExpenses()
         {
-            return Expenses;
+            return _expenses;
         }
         
         public void AddEntity<T>(T entity) where T : class
         {
             if (entity is User user)
-                Users.Add(user);
+                _users.Add(user);
             else if (entity is Expense expense)
-                Expenses.Add(expense);
+                _expenses.Add(expense);
             else throw new InvalidDataException("Invalid entity type");
+        }
+
+        public int[,] GetBalancesData()
+        {
+            return _balancesData;
+        }
+
+        public void UpdateBalancesData(int[,] balancesData)
+        {
+            _balancesData = balancesData;
+        }
+
+        public Dictionary<string, int> GetUserEmailToIndexMap()
+        {
+            return _userEmailToIndexMap;
+        }
+
+        public void UpdateBalancesData(int[,] balancesData, Dictionary<string, int> userEmailToIndex)
+        {
+            
         }
     }
 }
