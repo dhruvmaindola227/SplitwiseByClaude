@@ -32,6 +32,8 @@ namespace SplitwiseByClaude
                 Console.WriteLine("5. List all expenses for a user");
                 Console.WriteLine("6. List owed expenses for a user");
                 Console.WriteLine("7. List paid expenses for a user");
+                Console.WriteLine("8. Show all balances");
+                Console.WriteLine("9. Show balances for a user");
                 Console.WriteLine("0. Exit");
                 Console.Write("Option: ");
                 var input = Console.ReadLine();
@@ -140,6 +142,28 @@ namespace SplitwiseByClaude
                         try
                         {
                             splitwiseApp.GetPaidExpensesForUser(ue3);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error: {ex.Message}");
+                        }
+                        break;
+                    case "8":
+                        try
+                        {
+                            splitwiseApp.GetAllBalances();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error: {ex.Message}");
+                        }
+                        break;
+                    case "9":
+                        Console.Write("User email: ");
+                        var ue4 = Console.ReadLine() ?? string.Empty;
+                        try
+                        {
+                            splitwiseApp.GetBalanceForUser(ue4);
                         }
                         catch (Exception ex)
                         {

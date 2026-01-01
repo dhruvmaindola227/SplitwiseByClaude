@@ -10,15 +10,16 @@ namespace SplitwiseByClaude
     {
         public static bool IsValidEmail(string email)
         {
-            try
-            {
-                var validateEmail = new System.Net.Mail.MailAddress(email);
-                return validateEmail.Address.Equals(email, StringComparison.OrdinalIgnoreCase);
-            }
-            catch
-            {
-                return false;
-            }
+            return true;
+            //try
+            //{
+            //    var validateEmail = new System.Net.Mail.MailAddress(email);
+            //    return validateEmail.Address.Equals(email, StringComparison.OrdinalIgnoreCase);
+            //}
+            //catch
+            //{
+            //    return false;
+            //}
         }
     }
 }

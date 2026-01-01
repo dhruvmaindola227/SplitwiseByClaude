@@ -7,10 +7,12 @@ namespace SplitwiseByClaude
     {
         private readonly IUserService _userService;
         private readonly IExpenseService _expenseService;
-        public SplitwiseApplication(IUserService userService, IExpenseService expenseService)
+        private readonly IBalanceService _balanceService;
+        public SplitwiseApplication(IUserService userService, IExpenseService expenseService, IBalanceService balanceService)
         {
             _expenseService = expenseService;
             _userService = userService;
+            _balanceService = balanceService;
         }
         public void AddExpense(string description, int amount, DateTime dateIncurred, string paidByEmail, SplitType splitType, List<string> splitBetweenEmails, Dictionary<string, int>? userEmailVsValue)
         {
@@ -72,6 +74,32 @@ namespace SplitwiseByClaude
             foreach (var expense in paidExpenses)
             {
                 Console.WriteLine($"Description: {expense.Description}, Amount: {expense.Amount}, AmounOwed: {expense.UserEmailVsSplit[userEmail].Amount}, DateIncurred: {expense.DateIncurred}, SplitType: {expense.SplitType}");
+            }
+        }
+
+        public void GetAllBalances()
+        {
+            Console.WriteLine("Balances:\n");
+            var balances = _balanceService.GetAllBalances();
+            foreach (var lender in balances)
+            {
+                foreach (var borrower in lender.Value)
+                {
+                    Console.WriteLine($"{borrower.Key} owes {lender.Key}: {borrower.Value}");
+                }
+            }
+        }
+
+        public void GetBalanceForUser(string userEmail)
+        {
+            Console.WriteLine($"Balances for user: {userEmail}\n");
+            var balances = _balanceService.GetBalanceForUser(userEmail);
+            foreach (var entry in balances)
+            {
+                if (entry.Value > 0)
+                    Console.WriteLine($"{entry.Key} owes {userEmail}: {entry.Value}");
+                else
+                    Console.WriteLine($"{userEmail} owes {entry.Key}: {Math.Abs(entry.Value)}");
             }
         }
     }

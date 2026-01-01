@@ -12,16 +12,52 @@ namespace SplitwiseByClaude.Services
         }
         public Dictionary<string, Dictionary<string, int>> GetAllBalances()
         {
-            throw new NotImplementedException();
+            Dictionary<string, Dictionary<string, int>> lenderVsOwerVsAmountDict = new(StringComparer.OrdinalIgnoreCase);
+            var usersBalanceInfoMatrix = _mockDb.GetBalancesData();
+            var userVsIndexDict = _mockDb.GetUserEmailToIndexMap();
+            Dictionary<int, string> indexVsUserEmailReverseDict = userVsIndexDict.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+            for (int i = 0; i < usersBalanceInfoMatrix.GetLength(0); i++)
+            {
+                for (int j = i + 1; j < usersBalanceInfoMatrix.GetLength(0); j++)
+                {
+                    int balance = usersBalanceInfoMatrix[i, j] - usersBalanceInfoMatrix[j, i];
+                    if (balance != 0)
+                    {
+                        var lenderIndex = balance > 0 ? i : j;
+                        var borrowerIndex = balance < 0 ? i : j;
+                        var lenderEmail = indexVsUserEmailReverseDict[lenderIndex];
+                        var borrowerEmail = indexVsUserEmailReverseDict[borrowerIndex];
+                        if (!lenderVsOwerVsAmountDict.TryGetValue(lenderEmail, out var borrowerVsAmount))
+                        {
+                            borrowerVsAmount = new(StringComparer.OrdinalIgnoreCase);
+                            lenderVsOwerVsAmountDict[lenderEmail] = borrowerVsAmount;
+                        }
+                        borrowerVsAmount[borrowerEmail] = Math.Abs(balance);
+                    }
+                }
+            }
+            return lenderVsOwerVsAmountDict;
         }
 
         public Dictionary<string, int> GetBalanceForUser(string userEmail)
         {
+            Dictionary<string, int> userEmailVsBalance = new(StringComparer.OrdinalIgnoreCase);
             var usersBalanceInfoMatrix = _mockDb.GetBalancesData();
             var userVsIndexDict = _mockDb.GetUserEmailToIndexMap();
-            // dhruv -> 0
-            // 
-            return new();
+            int currUserIndex = userVsIndexDict[userEmail];
+            Dictionary<int, string> indexVsUserEmailReverseDict = userVsIndexDict.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+            for (int i = 0; i < usersBalanceInfoMatrix.GetLength(0); i++)
+            {
+                if (i == currUserIndex) continue; // ignore self
+                int balance = usersBalanceInfoMatrix[currUserIndex, i] - usersBalanceInfoMatrix[i, currUserIndex];
+                if (balance != 0)
+                {
+                    var otherUserEmail = indexVsUserEmailReverseDict[i];
+                    userEmailVsBalance[otherUserEmail] = balance;
+                }
+                    
+            }
+            return userEmailVsBalance;
         }
 
         public void UpdateBalances(Expense expense)
@@ -29,7 +65,9 @@ namespace SplitwiseByClaude.Services
             var usersBalanceInfoMatrix = _mockDb.GetBalancesData();
             var userVsIndexDict = _mockDb.GetUserEmailToIndexMap();
             var paidByIndex = userVsIndexDict[expense.PaidByUserEmail];
-            var newMatrix = new int[usersBalanceInfoMatrix.Length, usersBalanceInfoMatrix.Length];
+            Console.WriteLine($"UpdateBalances -> IndexCount before: {usersBalanceInfoMatrix.GetLength(0)}");
+            var newMatrix = new int[usersBalanceInfoMatrix.GetLength(0), usersBalanceInfoMatrix.GetLength(0)];
+            Console.WriteLine($"UpdateBalances -> IndexCount after: {usersBalanceInfoMatrix.GetLength(0)}");
             usersBalanceInfoMatrix.Copy2DArray(newMatrix);
             foreach (var split in expense.UserEmailVsSplit.Values)
             {
@@ -48,9 +86,11 @@ namespace SplitwiseByClaude.Services
         {
             var usersBalanceInfoMatrix = _mockDb.GetBalancesData();
             var userVsIndexDict = _mockDb.GetUserEmailToIndexMap();
-            var matrixSize = usersBalanceInfoMatrix.Length;
+            var matrixSize = usersBalanceInfoMatrix.GetLength(0);
+            Console.WriteLine($"UpdateUsersBalanceInfo -> IndexCount before: {matrixSize}");
             int newCount = matrixSize + 1;
             var newMatrix = new int[newCount, newCount];
+            Console.WriteLine($"UpdateUsersBalanceInfo -> IndexCount after: {newMatrix.GetLength(0)}");
             var userVsIndexLocal = userVsIndexDict.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase);
             userVsIndexLocal.TryAdd(userEmail, matrixSize);
             usersBalanceInfoMatrix.Copy2DArray(newMatrix);

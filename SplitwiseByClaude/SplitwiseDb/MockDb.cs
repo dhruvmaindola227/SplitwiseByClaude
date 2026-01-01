@@ -12,12 +12,12 @@ namespace SplitwiseByClaude.SplitwiseDb
         private readonly List<User> _users;
         private readonly List<Expense> _expenses;
         private int[,] _balancesData;
-        private readonly Dictionary<string, int> _userEmailToIndexMap;
+        private Dictionary<string, int> _userEmailToIndexMap;
         public MockDb()
         {
             _users = new();
             _expenses = new();
-            _balancesData = new int[0,0];
+            _balancesData = new int[0, 0];
             _userEmailToIndexMap = new(StringComparer.OrdinalIgnoreCase);
         }
 
@@ -30,7 +30,7 @@ namespace SplitwiseByClaude.SplitwiseDb
         {
             return _expenses;
         }
-        
+
         public void AddEntity<T>(T entity) where T : class
         {
             if (entity is User user)
@@ -57,7 +57,8 @@ namespace SplitwiseByClaude.SplitwiseDb
 
         public void UpdateBalancesData(int[,] balancesData, Dictionary<string, int> userEmailToIndex)
         {
-            
+            _balancesData = balancesData;
+            _userEmailToIndexMap = userEmailToIndex;
         }
     }
 }
