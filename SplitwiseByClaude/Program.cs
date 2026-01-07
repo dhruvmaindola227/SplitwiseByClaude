@@ -10,16 +10,16 @@ namespace SplitwiseByClaude
     {
         static void Main(string[] args)
         {
-            HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
-            builder.Services.AddSingleton<IMockDb, MockDb>();
-            builder.Services.AddSingleton<IUserService, UserService>();
-            builder.Services.AddSingleton<IExpenseService, ExpenseService>();
-            builder.Services.AddSingleton<ISplitService, SplitService>();
-            builder.Services.AddSingleton<IBalanceService, BalanceService>();
-            builder.Services.AddSingleton<SplitwiseApplication>();
-            var app = builder.Build();
+            var servicesCollection = new ServiceCollection();
+            servicesCollection.AddSingleton<IMockDb, MockDb>();
+            servicesCollection.AddSingleton<IUserService, UserService>();
+            servicesCollection.AddSingleton<IExpenseService, ExpenseService>();
+            servicesCollection.AddSingleton<ISplitService, SplitService>();
+            servicesCollection.AddSingleton<IBalanceService, BalanceService>();
+            servicesCollection.AddSingleton<SplitwiseApplication>();
             Console.WriteLine("Splitwise application");
-            var splitwiseApp = app.Services.GetRequiredService<SplitwiseApplication>();
+            using var servicesProvider = servicesCollection.BuildServiceProvider();
+            var splitwiseApp = servicesProvider.GetRequiredService<SplitwiseApplication>();
 
             bool exit = false;
             while (!exit)
